@@ -8,7 +8,8 @@ const DEFAULT_ENABLED_CITIES = ['vilnius', 'kaunas', 'palanga'];
 export default function Home() {
   const [enabledCities, setEnabledCities] = useState(DEFAULT_ENABLED_CITIES);
   const [city, setCity] = useState('vilnius');
-  const [weatherData, setWeatherData] = useState(null);
+  const [allCities, setAllCities] = useState(null); // all cities data from one fetch
+  const [cachedAt, setCachedAt] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -25,11 +26,9 @@ export default function Home() {
     }
   }, []);
 
-  // Save enabled cities to localStorage when they change
   const handleCitiesChange = (newCities) => {
     setEnabledCities(newCities);
     localStorage.setItem('enabledCities', JSON.stringify(newCities));
-    // If current city is disabled, switch to first enabled city
     if (!newCities.includes(city) && newCities.length > 0) {
       setCity(newCities[0]);
     }
@@ -38,14 +37,29 @@ export default function Home() {
   const fetchWeather = (forceRefresh = false) => {
     setLoading(true);
     setError(null);
-    const url = `/api/weather?city=${city}${forceRefresh ? '&force=true' : ''}`;
+    const url = `/api/weather${forceRefresh ? '?force=true' : ''}`;
     fetch(url)
       .then((r) => r.json())
-      .then((data) => { setWeatherData(data); setLoading(false); })
+      .then((data) => {
+        setAllCities(data.cities);
+        setCachedAt(data.cachedAt);
+        setLoading(false);
+      })
       .catch(() => { setError('Failed to fetch weather data'); setLoading(false); });
   };
 
-  useEffect(() => { fetchWeather(); }, [city]);
+  // Fetch all cities once on load, then re-check every 15 min while page is open.
+  // The server only hits external APIs when its own cache is stale — so if multiple
+  // users are active, they all share the same server-side refresh cycle.
+  // If nobody has the page open, no requests are made and the server rests.
+  useEffect(() => {
+    fetchWeather();
+    const interval = setInterval(() => fetchWeather(), 15 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // City switching is instant — no API call needed
+  const weatherData = allCities?.[city] || null;
 
   return (
     <div className="app-wrapper">
@@ -61,7 +75,7 @@ export default function Home() {
           cities={enabledCities}
           onCityChange={setCity}
           totalDays={weatherData?.totalDays || 3}
-          cachedAt={weatherData?.cachedAt || null}
+          cachedAt={cachedAt}
           enabledCities={enabledCities}
           onCitiesChange={handleCitiesChange}
           onForceRefresh={() => fetchWeather(true)}
