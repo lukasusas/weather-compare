@@ -607,20 +607,47 @@ body {
 }
 
 /* ─── Responsive ─── */
+/* ── Tablet (≤900px) ───────────────────────────────────────────────────────── */
 @media (max-width: 900px) {
-  .header-inner { flex-wrap: wrap; gap: 0.75rem; }
-  .header-center { order: 3; flex-basis: 100%; justify-content: flex-start; }
-}
-
-@media (max-width: 768px) {
-  .header h1 { font-size: 1.5rem; }
-  .live-badge { display: none; }
+  .header-inner {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  /* Row 1: title left, badge+gear right */
+  .header-left  { flex: 1; }
+  .header-right { flex-shrink: 0; }
+  /* Row 2: city tabs full width */
+  .header-center {
+    order: 3;
+    flex-basis: 100%;
+    justify-content: flex-start;
+  }
   .cards-grid { grid-template-columns: 1fr 1fr; gap: 0.75rem; }
-  .card-temp { font-size: 2.5rem; }
-  .city-tab { padding: 6px 14px; font-size: 0.8rem; }
 }
 
-@media (max-width: 520px) {
+/* ── Mobile (≤600px) ───────────────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .header { padding: 0.75rem 1rem; }
+  .header h1 { font-size: 1.3rem; }
+  .header-subtitle { font-size: 0.75rem; }
+
+  /* Compact badge — keep visible but shrink */
+  .live-badge {
+    font-size: 0.7rem;
+    padding: 4px 10px;
+    gap: 5px;
+  }
+  .live-dot { width: 6px; height: 6px; }
+
+  .city-tab { padding: 5px 11px; font-size: 0.78rem; }
+  .city-switcher { gap: 4px; }
+
+  .card-temp { font-size: 2.5rem; }
+}
+
+/* ── Small phones (≤420px) ─────────────────────────────────────────────────── */
+@media (max-width: 420px) {
   .cards-grid { grid-template-columns: 1fr; }
-  .main-content { padding: 1rem 1rem 3rem; }
+  .main-content { padding: 1rem 0.75rem 3rem; }
+  .day-heading { font-size: 1.2rem; }
 }
