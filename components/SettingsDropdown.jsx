@@ -12,7 +12,7 @@ const ALL_AVAILABLE_CITIES = [
   { key: 'riodejaneiro', label: 'Rio de Janeiro, Brazil' },
 ];
 
-export default function SettingsDropdown({ enabledCities, onCitiesChange }) {
+export default function SettingsDropdown({ enabledCities, onCitiesChange, onForceRefresh }) {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleCity = (cityKey) => {
@@ -46,6 +46,14 @@ export default function SettingsDropdown({ enabledCities, onCitiesChange }) {
                 <span>{city.label}</span>
               </label>
             ))}
+          </div>
+          <div className="settings-footer">
+            <button
+              className="settings-refresh-btn"
+              onClick={() => { onForceRefresh(); setIsOpen(false); }}
+            >
+              ↻ Refresh now
+            </button>
           </div>
         </div>
       )}
