@@ -37,7 +37,8 @@ export default function Home() {
   const fetchWeather = (forceRefresh = false) => {
     setLoading(true);
     setError(null);
-    const url = `/api/weather${forceRefresh ? '?force=true' : ''}`;
+    // Force refresh uses a timestamp to create a unique URL the CDN hasn't cached
+    const url = forceRefresh ? `/api/weather?force=true&t=${Date.now()}` : '/api/weather';
     fetch(url)
       .then((r) => r.json())
       .then((data) => {

@@ -344,11 +344,22 @@ export default async function handler(req, res) {
     res.setHeader('Retry-After', Math.ceil(limit.retryAfterMs / 1000));
     return res.status(429).json({ error: limit.reason });
   }
-  res.setHeader('Cache-Control', 'no-store');
 
   const force = req.query.force === 'true';
 
-  if (!force && globalCache && (Date.now() - globalCache.cachedAt) < CACHE_TTL_MS) {
+  if (force) {
+    // Force refresh: bypass CDN and in-memory cache, don't let CDN cache this response
+    res.setHeader('Cache-Control', 'no-store');
+    const data = await refreshAllCities();
+    return res.status(200).json(data);
+  }
+
+  // Normal request: serve from in-memory cache if the same instance has it,
+  // otherwise fetch fresh. Tell Vercel's CDN to cache for 15 min —
+  // this is the primary shared cache across all instances and page reloads.
+  res.setHeader('Cache-Control', 'public, s-maxage=900, stale-while-revalidate=60');
+
+  if (globalCache && (Date.now() - globalCache.cachedAt) < CACHE_TTL_MS) {
     return res.status(200).json(globalCache.data);
   }
 
