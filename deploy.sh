@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Weather Compare - Easy Deploy Script
+# Weather Compare - Easy Deploy to Vercel
 # Usage: ./deploy.sh "Your commit message"
 
 set -e
@@ -12,7 +12,7 @@ fi
 
 COMMIT_MSG="$1"
 
-echo "🚀 Deploying Weather Compare..."
+echo "🚀 Deploying Weather Compare to Vercel..."
 echo ""
 
 # Check git status
@@ -30,6 +30,6 @@ echo "📤 Pushing to GitHub..."
 git push
 
 echo ""
-echo "✨ Pushed! GitHub Actions will deploy automatically."
-echo "📊 Check status: https://github.com/YOUR_USERNAME/weather-compare/actions"
+echo "✨ Vercel will deploy automatically!"
+echo "📊 Check deployment: https://vercel.com/dashboard"
 echo ""
