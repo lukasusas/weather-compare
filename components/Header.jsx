@@ -30,7 +30,7 @@ function useDataAge(cachedAt) {
     };
 
     update();
-    const interval = setInterval(update, 15000); // re-check every 15s
+    const interval = setInterval(update, 15000);
     return () => clearInterval(interval);
   }, [cachedAt]);
 
@@ -40,6 +40,7 @@ function useDataAge(cachedAt) {
 export default function Header({ city, cities, onCityChange, totalDays, cachedAt, enabledCities, onCitiesChange, onForceRefresh }) {
   const dataAgeLabel = useDataAge(cachedAt);
   const isLive = dataAgeLabel === 'Live data';
+  const [hovered, setHovered] = useState(false);
 
   return (
     <header className="header">
@@ -66,14 +67,18 @@ export default function Header({ city, cities, onCityChange, totalDays, cachedAt
         </div>
 
         <div className="header-right">
-          <div className="live-badge">
+          <div
+            className={`live-badge${!isLive ? ' live-badge--stale' : ''}`}
+            onClick={!isLive ? onForceRefresh : undefined}
+            onMouseEnter={() => !isLive && setHovered(true)}
+            onMouseLeave={() => setHovered(false)}
+          >
             <span className={`live-dot${isLive ? '' : ' live-dot--stale'}`}></span>
-            {dataAgeLabel}
+            {!isLive && hovered ? 'Refresh now?' : dataAgeLabel}
           </div>
           <SettingsDropdown
             enabledCities={enabledCities}
             onCitiesChange={onCitiesChange}
-            onForceRefresh={onForceRefresh}
           />
         </div>
       </div>
