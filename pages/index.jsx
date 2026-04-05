@@ -35,14 +35,17 @@ export default function Home() {
     }
   };
 
-  useEffect(() => {
+  const fetchWeather = (forceRefresh = false) => {
     setLoading(true);
     setError(null);
-    fetch(`/api/weather?city=${city}`)
+    const url = `/api/weather?city=${city}${forceRefresh ? '&force=true' : ''}`;
+    fetch(url)
       .then((r) => r.json())
       .then((data) => { setWeatherData(data); setLoading(false); })
       .catch(() => { setError('Failed to fetch weather data'); setLoading(false); });
-  }, [city]);
+  };
+
+  useEffect(() => { fetchWeather(); }, [city]);
 
   return (
     <div className="app-wrapper">
@@ -58,8 +61,10 @@ export default function Home() {
           cities={enabledCities}
           onCityChange={setCity}
           totalDays={weatherData?.totalDays || 3}
+          cachedAt={weatherData?.cachedAt || null}
           enabledCities={enabledCities}
           onCitiesChange={handleCitiesChange}
+          onForceRefresh={() => fetchWeather(true)}
         />
 
         <main className="main-content">

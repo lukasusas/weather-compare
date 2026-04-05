@@ -1,5 +1,9 @@
 import { checkRateLimit } from '../../utils/rateLimiter';
 
+// ── In-memory cache (shared across requests on the same serverless instance) ──
+const CACHE_TTL_MS = 15 * 60 * 1000; // 15 minutes
+const cache = {}; // { [cityKey]: { data, cachedAt } }
+
 const CITIES = {
   vilnius: { name: 'Vilnius', lat: 54.6872, lon: 25.2797, meteoCode: 'vilnius' },
   kaunas:  { name: 'Kaunas',  lat: 54.9039, lon: 24.1383, meteoCode: 'kaunas' },
@@ -335,6 +339,13 @@ export default async function handler(req, res) {
 
   const cityKey = (req.query.city || 'vilnius').toLowerCase();
   const city    = CITIES[cityKey] || CITIES.vilnius;
+  const force   = req.query.force === 'true';
+
+  // Serve from cache if fresh and not forced
+  const cached = cache[cityKey];
+  if (!force && cached && (Date.now() - cached.cachedAt) < CACHE_TTL_MS) {
+    return res.status(200).json(cached.data);
+  }
 
   const [meteoTimestamps, openMeteoData, accuResult, owList] = await Promise.all([
     fetchMeteoLt(city.meteoCode),
@@ -431,5 +442,9 @@ export default async function handler(req, res) {
     return { date: label, sources };
   });
 
-  res.status(200).json({ city: city.name, totalDays: maxDays, days });
+  const cachedAt = Date.now();
+  const payload  = { city: city.name, totalDays: maxDays, cachedAt, days };
+  cache[cityKey] = { data: payload, cachedAt };
+
+  res.status(200).json(payload);
 }

@@ -209,6 +209,33 @@ body {
   accent-color: #0071e3;
 }
 
+.settings-footer {
+  padding: 10px 16px 14px;
+  border-top: 1px solid rgba(0,0,0,0.06);
+}
+
+.settings-refresh-btn {
+  width: 100%;
+  padding: 8px 0;
+  background: rgba(0, 113, 227, 0.08);
+  border: 1px solid rgba(0, 113, 227, 0.2);
+  border-radius: 8px;
+  color: #0071e3;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.settings-refresh-btn:hover {
+  background: rgba(0, 113, 227, 0.15);
+}
+
+.live-dot--stale {
+  background: #f5a623;
+  animation: none;
+}
+
 /* ─── Day Section ─── */
 .day-section {
   margin-bottom: 2.5rem;

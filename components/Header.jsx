@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import SettingsDropdown from './SettingsDropdown';
 
 const CITY_LABELS = {
@@ -12,7 +13,34 @@ const CITY_LABELS = {
   riodejaneiro: 'Rio',
 };
 
-export default function Header({ city, cities, onCityChange, totalDays, enabledCities, onCitiesChange }) {
+function useDataAge(cachedAt) {
+  const [label, setLabel] = useState('Live data');
+
+  useEffect(() => {
+    if (!cachedAt) return;
+
+    const update = () => {
+      const seconds = Math.floor((Date.now() - cachedAt) / 1000);
+      if (seconds < 60) {
+        setLabel('Live data');
+      } else {
+        const minutes = Math.floor(seconds / 60);
+        setLabel(`${minutes} min${minutes !== 1 ? 's' : ''} ago`);
+      }
+    };
+
+    update();
+    const interval = setInterval(update, 15000); // re-check every 15s
+    return () => clearInterval(interval);
+  }, [cachedAt]);
+
+  return label;
+}
+
+export default function Header({ city, cities, onCityChange, totalDays, cachedAt, enabledCities, onCitiesChange, onForceRefresh }) {
+  const dataAgeLabel = useDataAge(cachedAt);
+  const isLive = dataAgeLabel === 'Live data';
+
   return (
     <header className="header">
       <div className="header-inner">
@@ -39,10 +67,14 @@ export default function Header({ city, cities, onCityChange, totalDays, enabledC
 
         <div className="header-right">
           <div className="live-badge">
-            <span className="live-dot"></span>
-            Live data
+            <span className={`live-dot${isLive ? '' : ' live-dot--stale'}`}></span>
+            {dataAgeLabel}
           </div>
-          <SettingsDropdown enabledCities={enabledCities} onCitiesChange={onCitiesChange} />
+          <SettingsDropdown
+            enabledCities={enabledCities}
+            onCitiesChange={onCitiesChange}
+            onForceRefresh={onForceRefresh}
+          />
         </div>
       </div>
     </header>
