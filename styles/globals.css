@@ -256,6 +256,7 @@ body {
   align-items: center;
   gap: 1.5rem;
   padding: 1rem 1.5rem;
+  height: 80px;
   backdrop-filter: blur(28px) saturate(180%);
   -webkit-backdrop-filter: blur(28px) saturate(180%);
   background: rgba(255, 255, 255, 0.45);
@@ -311,6 +312,8 @@ body {
   display: flex;
   flex-direction: column;
   gap: 2px;
+  justify-content: center;
+  min-height: 100%;
 }
 
 .collapsed-condition {
@@ -318,6 +321,10 @@ body {
   color: #1d1d1f;
   text-transform: capitalize;
   font-weight: 400;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
 }
 
 .collapsed-source-count {
@@ -379,6 +386,7 @@ body {
   align-items: center;
   gap: 1.5rem;
   padding: 1rem 1.5rem;
+  height: 80px;
   backdrop-filter: blur(28px) saturate(180%);
   -webkit-backdrop-filter: blur(28px) saturate(180%);
   background: rgba(255, 255, 255, 0.45);
@@ -435,6 +443,8 @@ body {
   display: flex;
   flex-direction: column;
   gap: 2px;
+  justify-content: center;
+  min-height: 100%;
 }
 
 .expanded-condition {
@@ -442,6 +452,10 @@ body {
   color: #1d1d1f;
   text-transform: capitalize;
   font-weight: 400;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
 }
 
 .expanded-source-count {
@@ -1048,6 +1062,7 @@ body {
     grid-template-columns: auto auto 1fr;
     gap: 0.75rem;
     padding: 0.75rem 1rem;
+    height: 72px;
   }
 
   .collapsed-left {
@@ -1094,6 +1109,7 @@ body {
     gap: 0.75rem;
     padding: 0.75rem 1rem;
     margin-bottom: 0.75rem;
+    height: 72px;
   }
 
   .expanded-left {
@@ -1176,6 +1192,7 @@ body {
     grid-template-columns: auto 1fr auto;
     gap: 0.6rem;
     padding: 0.65rem 0.85rem;
+    height: 68px;
   }
 
   .collapsed-icon {
@@ -1195,6 +1212,7 @@ body {
     gap: 0.6rem;
     padding: 0.65rem 0.85rem;
     margin-bottom: 0.6rem;
+    height: 68px;
   }
 
   .expanded-icon {
