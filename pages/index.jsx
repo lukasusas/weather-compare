@@ -7,6 +7,7 @@ import ExpandedDayHeader from '../components/ExpandedDayHeader';
 
 const DEFAULT_ENABLED_CITIES = ['vilnius', 'kaunas', 'palanga'];
 
+// Collapsible weather cards with expand/collapse functionality
 export default function Home() {
   const [enabledCities, setEnabledCities] = useState(DEFAULT_ENABLED_CITIES);
   const [city, setCity] = useState('vilnius');
