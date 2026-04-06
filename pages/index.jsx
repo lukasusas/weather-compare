@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import WeatherCard from '../components/WeatherCard';
 import Header from '../components/Header';
 import LoadingState from '../components/LoadingState';
+import CollapsedDayRow from '../components/CollapsedDayRow';
 
 const DEFAULT_ENABLED_CITIES = ['vilnius', 'kaunas', 'palanga'];
 
@@ -12,6 +13,7 @@ export default function Home() {
   const [cachedAt, setCachedAt] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [expandedDays, setExpandedDays] = useState(new Set([0])); // Track which days are expanded (0 = today)
 
   // Load enabled cities from localStorage on mount
   useEffect(() => {
@@ -32,6 +34,16 @@ export default function Home() {
     if (!newCities.includes(city) && newCities.length > 0) {
       setCity(newCities[0]);
     }
+  };
+
+  const toggleDayExpansion = (dayIndex) => {
+    const newExpanded = new Set(expandedDays);
+    if (newExpanded.has(dayIndex)) {
+      newExpanded.delete(dayIndex);
+    } else {
+      newExpanded.add(dayIndex);
+    }
+    setExpandedDays(newExpanded);
   };
 
   const fetchWeather = (forceRefresh = false) => {
@@ -89,11 +101,18 @@ export default function Home() {
           {weatherData && !loading && weatherData.days.map((day, index) => (
             <div key={index} className="day-section">
               <h2 className="day-heading">{day.date}</h2>
-              <div className="cards-grid">
-                {day.sources.map((source) => (
-                  <WeatherCard key={source.id} data={source} />
-                ))}
-              </div>
+              {expandedDays.has(index) ? (
+                <div className="cards-grid">
+                  {day.sources.map((source) => (
+                    <WeatherCard key={source.id} data={source} />
+                  ))}
+                </div>
+              ) : (
+                <CollapsedDayRow
+                  day={day}
+                  onToggle={() => toggleDayExpansion(index)}
+                />
+              )}
             </div>
           ))}
         </main>
