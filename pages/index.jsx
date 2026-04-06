@@ -3,6 +3,7 @@ import WeatherCard from '../components/WeatherCard';
 import Header from '../components/Header';
 import LoadingState from '../components/LoadingState';
 import CollapsedDayRow from '../components/CollapsedDayRow';
+import ExpandedDayHeader from '../components/ExpandedDayHeader';
 
 const DEFAULT_ENABLED_CITIES = ['vilnius', 'kaunas', 'palanga'];
 
@@ -102,11 +103,17 @@ export default function Home() {
             <div key={index} className="day-section">
               <h2 className="day-heading">{day.date}</h2>
               {expandedDays.has(index) ? (
-                <div className="cards-grid">
-                  {day.sources.map((source) => (
-                    <WeatherCard key={source.id} data={source} />
-                  ))}
-                </div>
+                <>
+                  <ExpandedDayHeader
+                    day={day}
+                    onToggle={() => toggleDayExpansion(index)}
+                  />
+                  <div className="cards-grid">
+                    {day.sources.map((source) => (
+                      <WeatherCard key={source.id} data={source} />
+                    ))}
+                  </div>
+                </>
               ) : (
                 <CollapsedDayRow
                   day={day}

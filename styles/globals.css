@@ -372,6 +372,119 @@ body {
   }
 }
 
+/* ─── Expanded Day Header ─── */
+.expanded-day-header {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1rem 1.5rem;
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  background: rgba(255, 255, 255, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  border-radius: 16px;
+  margin-bottom: 1rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  animation: expandIn 0.3s ease-out;
+}
+
+.expanded-day-header:hover {
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.58);
+  box-shadow: 0 4px 16px rgba(31, 38, 135, 0.08);
+}
+
+.expanded-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  min-width: fit-content;
+}
+
+.expanded-icon {
+  font-size: 2.5rem;
+  line-height: 1;
+}
+
+.expanded-temps {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.expanded-max-temp {
+  font-size: 1.75rem;
+  font-weight: 300;
+  color: #1d1d1f;
+}
+
+.expanded-temp-sep {
+  color: #aeaeb2;
+  margin: 0 2px;
+}
+
+.expanded-min-temp {
+  font-size: 1rem;
+  font-weight: 300;
+  color: #6e6e73;
+}
+
+.expanded-middle {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.expanded-condition {
+  font-size: 0.9rem;
+  color: #1d1d1f;
+  text-transform: capitalize;
+  font-weight: 400;
+}
+
+.expanded-source-count {
+  font-size: 0.75rem;
+  color: #aeaeb2;
+}
+
+.expanded-right {
+  display: flex;
+  gap: 1.25rem;
+}
+
+.expanded-detail {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.85rem;
+}
+
+.expanded-detail-label {
+  font-size: 1rem;
+}
+
+.expanded-detail-value {
+  color: #1d1d1f;
+  font-weight: 500;
+  min-width: 35px;
+  text-align: right;
+}
+
+.expanded-collapse-hint {
+  color: #aeaeb2;
+  font-size: 0.9rem;
+  transition: transform 0.2s ease;
+  min-width: 16px;
+  text-align: center;
+}
+
+.expanded-day-header:hover .expanded-collapse-hint {
+  transform: translateY(-2px);
+  color: #1d1d1f;
+}
+
 /* ─── Weather Card ─── */
 .weather-card {
   position: relative;
@@ -748,6 +861,23 @@ body {
   .collapsed-source-count { color: #636366; }
   .collapsed-expand-hint { color: #636366; }
   .collapsed-day-row:hover .collapsed-expand-hint { color: #f5f5f7; }
+
+  .expanded-day-header {
+    background: rgba(255, 255, 255, 0.07);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .expanded-day-header:hover {
+    background: rgba(255, 255, 255, 0.12);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  }
+
+  .expanded-max-temp { color: #f5f5f7; }
+  .expanded-condition { color: #f5f5f7; }
+  .expanded-detail-value { color: #f5f5f7; }
+  .expanded-source-count { color: #636366; }
+  .expanded-collapse-hint { color: #636366; }
+  .expanded-day-header:hover .expanded-collapse-hint { color: #f5f5f7; }
 }
 
 /* ─── Responsive ─── */
@@ -787,6 +917,28 @@ body {
   }
 
   .collapsed-right {
+    gap: 0.75rem;
+  }
+
+  .expanded-day-header {
+    grid-template-columns: auto auto 1fr auto;
+    gap: 1rem;
+    padding: 0.85rem 1.25rem;
+  }
+
+  .expanded-left {
+    gap: 0.75rem;
+  }
+
+  .expanded-icon {
+    font-size: 2rem;
+  }
+
+  .expanded-max-temp {
+    font-size: 1.5rem;
+  }
+
+  .expanded-right {
     gap: 0.75rem;
   }
 }
@@ -935,6 +1087,52 @@ body {
   .collapsed-expand-hint {
     display: none;
   }
+
+  /* Expanded header — compact on mobile */
+  .expanded-day-header {
+    grid-template-columns: auto auto 1fr;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .expanded-left {
+    gap: 0.5rem;
+  }
+
+  .expanded-icon {
+    font-size: 1.75rem;
+  }
+
+  .expanded-max-temp {
+    font-size: 1.25rem;
+  }
+
+  .expanded-condition {
+    font-size: 0.8rem;
+  }
+
+  .expanded-source-count {
+    font-size: 0.65rem;
+  }
+
+  .expanded-right {
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .expanded-detail {
+    font-size: 0.75rem;
+  }
+
+  .expanded-detail-value {
+    min-width: 28px;
+  }
+
+  .expanded-collapse-hint {
+    display: none;
+  }
 }
 
 /* ── Small phones (≤420px) ─────────────────────────────────────────────────── */
@@ -989,6 +1187,25 @@ body {
   }
 
   .collapsed-detail {
+    font-size: 0.7rem;
+  }
+
+  .expanded-day-header {
+    grid-template-columns: auto 1fr auto;
+    gap: 0.6rem;
+    padding: 0.65rem 0.85rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .expanded-icon {
+    font-size: 1.5rem;
+  }
+
+  .expanded-max-temp {
+    font-size: 1.1rem;
+  }
+
+  .expanded-detail {
     font-size: 0.7rem;
   }
 }
