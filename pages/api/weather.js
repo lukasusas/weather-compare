@@ -301,7 +301,8 @@ async function fetchCityForecast(cityKey) {
 
   const days = getNextNDays(maxDays).map(({ label, date }, dayIndex) => {
     const isToday = dayIndex === 0;
-    const dateStr = date.toISOString().slice(0, 10);
+    // Format date in Vilnius timezone (not UTC) to match local date
+    const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
     const sources = [];
 
     // 1. Meteo.lt
