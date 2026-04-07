@@ -99,20 +99,48 @@ function omCondition(code) {
   return map[code] || 'Unknown';
 }
 
-async function fetchOpenMeteo(lat, lon) {
-  try {
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
-      `&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m` +
-      `&daily=temperature_2m_max,temperature_2m_min,weather_code,precipitation_sum,wind_speed_10m_max,relative_humidity_2m_max` +
-      `&timezone=Europe/Vilnius&forecast_days=16`;
-    const res = await fetch(url, { headers: { 'User-Agent': 'weather-compare/1.0' } });
-    if (!res.ok) throw new Error(`Open-Meteo ${res.status}`);
-    const data = await res.json();
-    return { current: data.current, daily: data.daily };
-  } catch (err) {
-    console.error('Open-Meteo error:', err.message);
-    return null;
+async function fetchOpenMeteo(lat, lon, retries = 2) {
+  const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
+    `&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m` +
+    `&daily=temperature_2m_max,temperature_2m_min,weather_code,precipitation_sum,wind_speed_10m_max,relative_humidity_2m_max` +
+    `&timezone=auto&forecast_days=16`;
+
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 8000);
+
+      const res = await fetch(url, {
+        headers: { 'User-Agent': 'weather-compare/1.0' },
+        signal: controller.signal
+      });
+
+      clearTimeout(timeout);
+
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`);
+      }
+
+      const data = await res.json();
+      if (!data.current || !data.daily) {
+        throw new Error('Incomplete data');
+      }
+
+      return { current: data.current, daily: data.daily };
+    } catch (err) {
+      const isLastAttempt = attempt === retries;
+      const waitMs = Math.pow(2, attempt) * 500; // Exponential backoff: 500ms, 1s, 2s
+
+      if (!isLastAttempt) {
+        console.log(`Open-Meteo attempt ${attempt + 1} failed (${err.message}), retrying in ${waitMs}ms...`);
+        await new Promise(resolve => setTimeout(resolve, waitMs));
+      } else {
+        console.error(`Open-Meteo failed after ${retries + 1} attempts:`, err.message);
+      }
+    }
   }
+
+  return null;
 }
 
 // ── OpenWeather ───────────────────────────────────────────────────────────────
