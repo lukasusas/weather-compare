@@ -1,8 +1,9 @@
 import { checkRateLimit } from '../../utils/rateLimiter';
 
 // ── Global cache — all cities fetched together ────────────────────────────────
-const CACHE_TTL_MS = 15 * 60 * 1000; // 15 minutes
+const CACHE_TTL_MS = 30 * 60 * 1000; // 30 minutes (increased from 15)
 let globalCache = null; // { data: { cachedAt, cities: {...} }, cachedAt }
+let lastSuccessfulCache = null; // Fallback: keep last successful cache if fetch fails
 
 const CITIES = {
   vilnius:      { name: 'Vilnius',               lat: 54.6872,  lon: 25.2797,  meteoCode: 'vilnius' },
@@ -333,8 +334,10 @@ async function refreshAllCities() {
   const cities   = {};
   cityKeys.forEach((key, i) => { cities[key] = results[i]; });
   const cachedAt = Date.now();
-  globalCache = { data: { cachedAt, cities }, cachedAt };
-  return globalCache.data;
+  const newCache = { data: { cachedAt, cities }, cachedAt };
+  globalCache = newCache;
+  lastSuccessfulCache = newCache; // Save as fallback
+  return newCache.data;
 }
 
 // ── Main handler ──────────────────────────────────────────────────────────────
@@ -354,15 +357,27 @@ export default async function handler(req, res) {
     return res.status(200).json(data);
   }
 
-  // Normal request: serve from in-memory cache if the same instance has it,
-  // otherwise fetch fresh. Tell Vercel's CDN to cache for 15 min —
-  // this is the primary shared cache across all instances and page reloads.
-  res.setHeader('Cache-Control', 'public, s-maxage=900, stale-while-revalidate=60');
+  // Normal request: serve from in-memory cache if fresh (30 min).
+  // CDN caches for 30 min, with 5 min stale-while-revalidate window.
+  // This reduces API calls significantly while maintaining reasonable freshness.
+  res.setHeader('Cache-Control', 'public, s-maxage=1800, stale-while-revalidate=300');
 
   if (globalCache && (Date.now() - globalCache.cachedAt) < CACHE_TTL_MS) {
     return res.status(200).json(globalCache.data);
   }
 
-  const data = await refreshAllCities();
-  return res.status(200).json(data);
+  // Cache expired: try to fetch fresh data
+  try {
+    const data = await refreshAllCities();
+    return res.status(200).json(data);
+  } catch (err) {
+    // If fetch fails, fall back to last successful cache if available
+    console.error('Failed to refresh all cities:', err.message);
+    if (lastSuccessfulCache) {
+      console.log('Using fallback cache from', new Date(lastSuccessfulCache.cachedAt).toISOString());
+      return res.status(200).json(lastSuccessfulCache.data);
+    }
+    // No fallback available, return error
+    return res.status(503).json({ error: 'Weather data temporarily unavailable' });
+  }
 }
