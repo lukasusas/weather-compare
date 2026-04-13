@@ -71,7 +71,7 @@ export default function CollapsedDayRow({ day, onToggle }) {
         </div>
         <div className="collapsed-detail">
           <span className="collapsed-detail-label">💨</span>
-          <span className="collapsed-detail-value">{avgWind} km/h</span>
+          <span className="collapsed-detail-value">{avgWind} m/s</span>
         </div>
         <div className="collapsed-detail">
           <span className="collapsed-detail-label">🌧️</span>

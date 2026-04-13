@@ -9,7 +9,7 @@ export default function ComparisonTable({ sources }) {
     { label: 'Feels Like', key: 'feelsLike', unit: '°C' },
     { label: 'Min/Max', key: 'minMaxTemp', unit: '°C' },
     { label: 'Humidity', key: 'humidity', unit: '%' },
-    { label: 'Wind Speed', key: 'windSpeed', unit: 'km/h' },
+    { label: 'Wind Speed', key: 'windSpeed', unit: 'm/s' },
     { label: 'Rain Chance', key: 'rainChance', unit: '%' },
     { label: 'Pressure', key: 'pressure', unit: 'mb' },
   ];

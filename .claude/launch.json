@@ -3,7 +3,7 @@
   "configurations": [
     {
       "name": "weather-compare",
-      "runtimeExecutable": "/private/tmp/node-v22.13.1-darwin-arm64/bin/npm",
+      "runtimeExecutable": "/private/tmp/nodejs/bin/npm",
       "runtimeArgs": ["run", "dev"],
       "port": 3000
     }

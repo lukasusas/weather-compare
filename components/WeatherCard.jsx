@@ -39,7 +39,7 @@ export default function WeatherCard({ data }) {
         </div>
         <div className="detail-row">
           <span className="detail-label">Wind</span>
-          <span className="detail-value">{data.windSpeed} km/h</span>
+          <span className="detail-value">{data.windSpeed} m/s</span>
         </div>
         <div className="detail-row">
           <span className="detail-label">Pressure</span>

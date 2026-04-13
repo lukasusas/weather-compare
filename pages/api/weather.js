@@ -175,7 +175,7 @@ function aggregateOpenWeatherDay(list, targetDateStr) {
     currentTemp: rows[0].main.temp,
     condition:   midday.weather?.[0]?.description || 'Unknown',
     humidity:    Math.round(humid.reduce((a, b) => a + b, 0) / humid.length),
-    windSpeed:   Math.round(Math.max(...winds) * 3.6),
+    windSpeed:   Math.round(Math.max(...winds)),
     pressure:    Math.round(press.reduce((a, b) => a + b, 0) / press.length),
     rainChance:  Math.round(Math.max(...pops) * 100),
   };

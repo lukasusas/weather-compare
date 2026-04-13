@@ -66,7 +66,7 @@ export default function ExpandedDayHeader({ day, onToggle }) {
         </div>
         <div className="expanded-detail">
           <span className="expanded-detail-label">💨</span>
-          <span className="expanded-detail-value">{avgWind} km/h</span>
+          <span className="expanded-detail-value">{avgWind} m/s</span>
         </div>
         <div className="expanded-detail">
           <span className="expanded-detail-label">🌧️</span>
