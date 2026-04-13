@@ -1,6 +1,14 @@
 import { getWeatherIcon } from '../utils/weatherIcons';
+import { useSettings } from '../context/SettingsContext';
+import {
+  convertTemperature, convertWindSpeed, convertPressure,
+  tempUnit, windUnit, pressureUnit,
+} from '../utils/conversions';
 
 export default function WeatherCard({ data }) {
+  const { settings } = useSettings();
+  const { units } = settings;
+
   if (data.unavailable) {
     return (
       <div className="weather-card weather-card--unavailable">
@@ -15,14 +23,23 @@ export default function WeatherCard({ data }) {
     );
   }
 
+  const maxTemp   = convertTemperature(data.maxTemp, units.temperature);
+  const minTemp   = convertTemperature(data.minTemp, units.temperature);
+  const feelsLike = convertTemperature(data.feelsLike, units.temperature);
+  const wind      = convertWindSpeed(data.windSpeed, units.windSpeed);
+  const pressure  = convertPressure(data.pressure, units.pressure);
+  const tUnit     = tempUnit(units.temperature);
+  const wUnit     = windUnit(units.windSpeed);
+  const pUnit     = pressureUnit(units.pressure);
+
   return (
     <div className="weather-card">
       <div className="card-source-name">{data.source}</div>
       <div className="card-source-bar"></div>
 
       <div className="card-temp-row">
-        <span className="card-temp">{data.maxTemp}</span>
-        <span className="card-temp-unit">°C</span>
+        <span className="card-temp">{maxTemp}</span>
+        <span className="card-temp-unit">{tUnit}</span>
       </div>
       <p className="card-condition">{data.condition}</p>
 
@@ -31,7 +48,7 @@ export default function WeatherCard({ data }) {
       <div className="card-details">
         <div className="detail-row">
           <span className="detail-label">Feels like</span>
-          <span className="detail-value">{data.feelsLike}°C</span>
+          <span className="detail-value">{feelsLike}{tUnit}</span>
         </div>
         <div className="detail-row">
           <span className="detail-label">Humidity</span>
@@ -39,11 +56,11 @@ export default function WeatherCard({ data }) {
         </div>
         <div className="detail-row">
           <span className="detail-label">Wind</span>
-          <span className="detail-value">{data.windSpeed} km/h</span>
+          <span className="detail-value">{wind} {wUnit}</span>
         </div>
         <div className="detail-row">
           <span className="detail-label">Pressure</span>
-          <span className="detail-value">{data.pressure > 0 ? `${data.pressure} mb` : '—'}</span>
+          <span className="detail-value">{pressure > 0 ? `${pressure} ${pUnit}` : '—'}</span>
         </div>
         <div className="detail-row">
           <span className="detail-label">Rain chance</span>
@@ -54,11 +71,11 @@ export default function WeatherCard({ data }) {
       <div className="card-minmax">
         <div>
           <p className="minmax-label">Min</p>
-          <p className="minmax-min">{data.minTemp}°</p>
+          <p className="minmax-min">{minTemp}°</p>
         </div>
         <div>
           <p className="minmax-label">Avg</p>
-          <p className="minmax-max">{Math.round((data.minTemp + data.maxTemp) / 2)}°</p>
+          <p className="minmax-max">{convertTemperature(Math.round((data.minTemp + data.maxTemp) / 2), units.temperature)}°</p>
         </div>
       </div>
 

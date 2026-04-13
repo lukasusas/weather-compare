@@ -4,39 +4,25 @@ import Header from '../components/Header';
 import LoadingState from '../components/LoadingState';
 import CollapsedDayRow from '../components/CollapsedDayRow';
 import ExpandedDayHeader from '../components/ExpandedDayHeader';
+import { SettingsProvider, useSettings } from '../context/SettingsContext';
 
-const DEFAULT_ENABLED_CITIES = ['vilnius', 'kaunas', 'palanga'];
+function WeatherApp() {
+  const { settings, setEnabledCities } = useSettings();
+  const { enabledCities } = settings;
 
-// Collapsible weather cards with expand/collapse functionality
-export default function Home() {
-  const [enabledCities, setEnabledCities] = useState(DEFAULT_ENABLED_CITIES);
   const [city, setCity] = useState('vilnius');
-  const [allCities, setAllCities] = useState(null); // all cities data from one fetch
+  const [allCities, setAllCities] = useState(null);
   const [cachedAt, setCachedAt] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [expandedDays, setExpandedDays] = useState(new Set([0])); // Track which days are expanded (0 = today)
+  const [expandedDays, setExpandedDays] = useState(new Set([0]));
 
-  // Load enabled cities from localStorage on mount
+  // If the active city tab is removed from the enabled list, switch to the first remaining city
   useEffect(() => {
-    const saved = localStorage.getItem('enabledCities');
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        setEnabledCities(parsed);
-      } catch (e) {
-        setEnabledCities(DEFAULT_ENABLED_CITIES);
-      }
+    if (!enabledCities.includes(city) && enabledCities.length > 0) {
+      setCity(enabledCities[0]);
     }
-  }, []);
-
-  const handleCitiesChange = (newCities) => {
-    setEnabledCities(newCities);
-    localStorage.setItem('enabledCities', JSON.stringify(newCities));
-    if (!newCities.includes(city) && newCities.length > 0) {
-      setCity(newCities[0]);
-    }
-  };
+  }, [enabledCities]);
 
   const toggleDayExpansion = (dayIndex) => {
     const newExpanded = new Set(expandedDays);
@@ -51,7 +37,6 @@ export default function Home() {
   const fetchWeather = (forceRefresh = false) => {
     setLoading(true);
     setError(null);
-    // Force refresh uses a timestamp to create a unique URL the CDN hasn't cached
     const url = forceRefresh ? `/api/weather?force=true&t=${Date.now()}` : '/api/weather';
     fetch(url)
       .then((r) => r.json())
@@ -63,17 +48,12 @@ export default function Home() {
       .catch(() => { setError('Failed to fetch weather data'); setLoading(false); });
   };
 
-  // Fetch all cities once on load, then re-check every 15 min while page is open.
-  // The server only hits external APIs when its own cache is stale — so if multiple
-  // users are active, they all share the same server-side refresh cycle.
-  // If nobody has the page open, no requests are made and the server rests.
   useEffect(() => {
     fetchWeather();
     const interval = setInterval(() => fetchWeather(), 15 * 60 * 1000);
     return () => clearInterval(interval);
   }, []);
 
-  // City switching is instant — no API call needed
   const weatherData = allCities?.[city] || null;
 
   return (
@@ -91,8 +71,6 @@ export default function Home() {
           onCityChange={setCity}
           totalDays={weatherData?.totalDays || 3}
           cachedAt={cachedAt}
-          enabledCities={enabledCities}
-          onCitiesChange={handleCitiesChange}
           onForceRefresh={() => fetchWeather(true)}
         />
 
@@ -126,5 +104,13 @@ export default function Home() {
         </main>
       </div>
     </div>
+  );
+}
+
+export default function Home() {
+  return (
+    <SettingsProvider>
+      <WeatherApp />
+    </SettingsProvider>
   );
 }
