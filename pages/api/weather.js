@@ -103,7 +103,7 @@ async function fetchOpenMeteo(lat, lon, retries = 2) {
   const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
     `&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m` +
     `&daily=temperature_2m_max,temperature_2m_min,weather_code,precipitation_sum,wind_speed_10m_max,relative_humidity_2m_max` +
-    `&timezone=auto&forecast_days=16`;
+    `&wind_speed_unit=ms&timezone=auto&forecast_days=16`;
 
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
@@ -252,7 +252,7 @@ function fmtAccuWeather(dayIndex, dayData) {
     condition: dayData.Day?.IconPhrase || dayData.Headline?.Category || 'Unknown',
     feelsLike: Math.round(dayData.RealFeelTemperature?.Maximum?.Value || dayData.Temperature.Maximum.Value - 2),
     humidity: dayData.Day?.RelativeHumidity?.Average || 0,
-    windSpeed: Math.round(dayData.Day?.Wind?.Speed?.Value || 0),
+    windSpeed: Math.round((dayData.Day?.Wind?.Speed?.Value || 0) / 3.6),
     pressure: 0, rainChance: dayData.Day?.PrecipitationProbability || 0, updated: 'now',
   };
 }
@@ -327,7 +327,7 @@ async function fetchCityForecast(cityKey) {
         condition: curr.WeatherText || 'Unknown',
         feelsLike: Math.round(curr.RealFeelTemperature?.Metric?.Value ?? temp - 2),
         humidity: curr.RelativeHumidity || 0,
-        windSpeed: Math.round(curr.Wind?.Speed?.Metric?.Value ?? 0),
+        windSpeed: Math.round((curr.Wind?.Speed?.Metric?.Value ?? 0) / 3.6),
         pressure: Math.round(curr.Pressure?.Metric?.Value ?? 1013),
         rainChance: curr.PrecipitationSummary ? 10 : 0, updated: 'now',
       });
