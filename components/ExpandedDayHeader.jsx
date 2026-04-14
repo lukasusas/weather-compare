@@ -1,12 +1,7 @@
 import { getWeatherIcon } from '../utils/weatherIcons';
 import { useSettings } from '../context/SettingsContext';
 import { convertTemperature, convertWindSpeed, tempUnit, windUnit } from '../utils/conversions';
-
-function calculateAverage(values) {
-  const valid = values.filter(v => v !== null && v !== undefined && v > 0);
-  if (valid.length === 0) return 0;
-  return valid.reduce((a, b) => a + b, 0) / valid.length;
-}
+import { averageNonZero, averageWithZero } from '../utils/aggregations';
 
 export default function ExpandedDayHeader({ day, onToggle }) {
   const { settings } = useSettings();
@@ -24,9 +19,9 @@ export default function ExpandedDayHeader({ day, onToggle }) {
   // Aggregate in base units, convert for display
   const rawMaxTemp  = maxTemps.length > 0 ? Math.round(maxTemps.reduce((a, b) => a + b, 0) / maxTemps.length) : null;
   const rawMinTemp  = minTemps.length > 0 ? Math.round(minTemps.reduce((a, b) => a + b, 0) / minTemps.length) : null;
-  const avgHumidity = Math.round(calculateAverage(humidities));
-  const rawAvgWind  = calculateAverage(windSpeeds);
-  const avgRain     = Math.round(calculateAverage(rainChances));
+  const avgHumidity = Math.round(averageNonZero(humidities));
+  const rawAvgWind  = averageNonZero(windSpeeds);
+  const avgRain     = Math.round(averageWithZero(rainChances));
 
   const avgMaxTemp = rawMaxTemp != null ? convertTemperature(rawMaxTemp, units.temperature) : '—';
   const avgMinTemp = rawMinTemp != null ? convertTemperature(rawMinTemp, units.temperature) : '—';
