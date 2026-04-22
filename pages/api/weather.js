@@ -192,10 +192,10 @@ async function fetchAccuWeather(cityKey) {
   if (!apiKey) return { unavailable: true, source: 'AccuWeather', reason: 'Add ACCUWEATHER_API_KEY to .env.local' };
   const locationKey = ACCUWEATHER_KEYS[cityKey];
   if (!locationKey) return { unavailable: true, source: 'AccuWeather', reason: 'City not configured' };
-  const headers = { 'Authorization': `Bearer ${apiKey}`, 'User-Agent': 'weather-compare/1.0' };
+  const headers = { 'User-Agent': 'weather-compare/1.0' };
   try {
     const fRes = await fetch(
-      `https://dataservice.accuweather.com/forecasts/v1/daily/5day/${locationKey}?details=true&metric=true`,
+      `https://dataservice.accuweather.com/forecasts/v1/daily/5day/${locationKey}?apikey=${apiKey}&details=true&metric=true`,
       { headers }
     );
     if (fRes.ok) {
@@ -203,7 +203,7 @@ async function fetchAccuWeather(cityKey) {
       if (data.DailyForecasts?.length) return { data: data.DailyForecasts, type: 'forecast' };
     }
     const cRes = await fetch(
-      `https://dataservice.accuweather.com/currentconditions/v1/${locationKey}?details=true&metric=true`,
+      `https://dataservice.accuweather.com/currentconditions/v1/${locationKey}?apikey=${apiKey}&details=true&metric=true`,
       { headers }
     );
     if (!cRes.ok) throw new Error(`HTTP ${cRes.status}`);
